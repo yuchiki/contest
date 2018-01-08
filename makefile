@@ -1,10 +1,7 @@
 TEMPLATE = $(PWD)/template/template.sh
 SANDBOX = sandbox
-NEW = $TEMPLATE $CONTEST
-ABC = $(wildcard abc*)
-AGC = $(wildcard agc*)
 
-$(ABC)% :
+abc% :
 	rm -rf $(SANDBOX)
 	mkdir $(SANDBOX)
 	cd $(SANDBOX);\
@@ -13,7 +10,7 @@ $(ABC)% :
 	$(TEMPLATE) $@ C;\
 	$(TEMPLATE) $@ D
 
-$(AGC)% :
+agc% :
 	rm -rf $(SANDBOX)
 	mkdir $(SANDBOX)
 	cd $(SANDBOX);\

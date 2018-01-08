@@ -1,9 +1,6 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
-shopt -s expand_aliases
-source ~/.bash_aliases
-
 CONTEST=$1
 PROBLEM=$2
 LANGUAGE=cpp
@@ -11,7 +8,7 @@ NAME=${CONTEST}_${PROBLEM}
 
 SRC=${NAME}.${LANGUAGE}
 
-echo "Create Templates."
+echo "Creating ${NAME}..."
 mkdir ${NAME}
 cd ${NAME}
 cp -r $SCRIPT_DIR/.vscode ./

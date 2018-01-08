@@ -1,0 +1,14 @@
+MAIN = main
+CLIPBOARD = xsel --clipboard --output
+SRC = $(CONTEST)_$(PROBLEM).$(LANGUAGE)
+CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -DYUCHIKIDEBUG
+
+.PHONY: run clean
+run: $(MAIN)
+	$(CLIPBOARD) |  ./$(MAIN)
+
+$(MAIN): $(SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+clean:
+	$(RM) $(MAIN)

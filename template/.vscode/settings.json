@@ -1,0 +1,20 @@
+{
+    "cSpell.words": [
+        "dyuchikidebug",
+        "exitno",
+        "maxn",
+        "repi",
+        "repiinc",
+        "repir",
+        "repr",
+        "sayno",
+        "werror",
+        "wextra",
+        "xsel"
+    ],
+    "files.associations": {
+        "chrono": "cpp",
+        "limits": "cpp",
+        "valarray": "cpp"
+    }
+}

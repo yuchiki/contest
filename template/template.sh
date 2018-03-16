@@ -18,3 +18,4 @@ echo "PROBLEM = ${PROBLEM}" >> ./makefile
 echo "LANGUAGE = ${LANGUAGE}" >> ./makefile
 cat $SCRIPT_DIR/makefile_template >> ./makefile
 cp $SCRIPT_DIR/template.cpp ./${SRC}
+code . ./${SRC}

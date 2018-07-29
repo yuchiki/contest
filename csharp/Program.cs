@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,6 +12,8 @@ using static System.Math;
 namespace AtCoder {
     class Program {
         static void Main() {
+            var x = ReadInt();
+            FromTo(1, x).Where(z => z.Factors().Distinct().Count() <= 1).Last().Call(WriteLine);
         }
     }
 }
@@ -19,13 +22,45 @@ namespace AtCoder {
 
 namespace AtCoder {
     static class Util {
+        public static IEnumerable<int> Factors(this int n) {
+            for (int i = 1; i <= n; i++)
+                if (n % i == 0) yield return i;
+        }
+
+        public static IEnumerable<int> Natural() {
+            for (int i = 0;; i++) yield return i;
+        }
+        public static int Pow(int i, int exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
+
+        public static MultiSet<T> ToMultiSet<T>(this IEnumerable<T> t) => new MultiSet<T>(t);
+        public static int Plus(this int i, int j) => i + j;
+
+        public static int Max(this int i, int j) => i > j ? i : j;
+
+        public static bool IsPalindrome(string s) {
+            for (int i = 0; i < s.Length / 2; i++) {
+                if (s[i] != s[s.Length - 1 - i]) return false;
+            }
+            return true;
+        }
+        public readonly static VectorInt2[] Dir8 = {
+            new VectorInt2(-1, -1),
+            new VectorInt2(-1, 0),
+            new VectorInt2(-1, 1),
+            new VectorInt2(0, -1),
+            new VectorInt2(0, 1),
+            new VectorInt2(1, -1),
+            new VectorInt2(1, 0),
+            new VectorInt2(1, 1)
+        };
+
         public const long MODCONST = 1000000007;
 
         public static T debug<T>(this T value) {
             Console.Error.WriteLine($"debug:{value}");
             return value;
         }
-
 
         public static T Id<T>(T t) => t;
         public static long ToLong(this String s) => long.Parse(s);
@@ -38,6 +73,14 @@ namespace AtCoder {
         public static void Times(this long n, Action action) {
             for (long i = 0; i < n; i++) action();
         }
+
+        public static IEnumerable<T> Times<T>(this int n, Func<T> func) {
+            for (long i = 0; i < n; i++) yield return func();
+        }
+        public static IEnumerable<T> Times<T>(this long n, Func<T> func) {
+            for (long i = 0; i < n; i++) yield return func();
+        }
+
         public static void Call<T>(this T t, Action<T> action) => action(t);
         public static bool In<T>(this T t, IEnumerable<T> range) =>
             range.Contains(t);
@@ -47,22 +90,28 @@ namespace AtCoder {
             foreach (var v in e) action(v);
         }
 
+        public static IEnumerable<int> FromTo(int a, int b) => Range(a, Max(b - a + 1, 0));
         public static IEnumerable<T> Repeat<T>(T t) {
             while (true) yield return t;
         }
         public static IEnumerable<T> Replicate<T>(int n, T t) => Repeat(t).Take(n);
 
         public static IEnumerable<T> Cycle<T>(IEnumerable<T> e) {
-            while (true) foreach (var v in e) yield return v;
+            while (true)
+                foreach (var v in e) yield return v;
         }
 
-        public static VectorInt2 ReadVectorInt2() => 
+        public static VectorInt2 ReadVectorInt2() =>
             new VectorInt2(ReadInt(), ReadInt());
 
         public static string ReplaceX(this string input, string pattern, string replace) =>
             Regex.Replace(input, pattern, replace);
 
         public static IEnumerable<int> Range(int i, int j) => Enumerable.Range(i, j);
+        public static IEnumerable<long> Range(long i, long j) {
+            for (long k = i; k < i + j; k++) yield return k;
+
+        }
         public static void Swap<T>(this IList<T> enumerable, int i, int j) {
             var buf = enumerable[i];
             enumerable[i] = enumerable[j];
@@ -73,18 +122,18 @@ namespace AtCoder {
             int half = (j - i) / 2;
             for (int k = 0; k <= half; k++) enumerable.Swap(i + k, j - k);
         }
-        
+
         public static bool isEmpty<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
     }
 
     static class Cin {
         private static Queue<string> tokens;
-        static Cin () {
-            string line;
-            tokens = new Queue<string> ();
-            while ((line = Console.ReadLine ()) != null) {
-                foreach (var token in line.Split (' ')) {
-                    tokens.Enqueue (token);
+        static Cin() {
+        string line;
+        tokens = new Queue<string>();
+        while ((line = Console.ReadLine()) != null) {
+        foreach (var token in line.Split(' ')) {
+        tokens.Enqueue(token);
                 }
             }
         }
@@ -114,24 +163,25 @@ namespace AtCoder {
         public int Y { get; set; }
 
         public VectorInt2(int x, int y) {
-            X = x; Y = y;
+            X = x;
+            Y = y;
         }
 
-        static public VectorInt2 operator+ (VectorInt2 v1, VectorInt2 v2) =>
+        static public VectorInt2 operator +(VectorInt2 v1, VectorInt2 v2) =>
             new VectorInt2(v1.X + v2.X, v1.Y + v2.Y);
-        static public VectorInt2 operator- (VectorInt2 v1, VectorInt2 v2) =>
+        static public VectorInt2 operator -(VectorInt2 v1, VectorInt2 v2) =>
             new VectorInt2(v1.X - v2.X, v1.Y - v2.Y);
-        static public VectorInt2 operator* (VectorInt2 v1, VectorInt2 v2) =>
+        static public VectorInt2 operator *(VectorInt2 v1, VectorInt2 v2) =>
             new VectorInt2(v1.X * v2.X, v1.Y * v2.Y);
-        static public VectorInt2 operator* (VectorInt2 v1, int i) =>
+        static public VectorInt2 operator *(VectorInt2 v1, int i) =>
             new VectorInt2(v1.X * i, v1.Y * i);
-        static public VectorInt2 operator* (int i, VectorInt2 v2) =>
+        static public VectorInt2 operator *(int i, VectorInt2 v2) =>
             new VectorInt2(i * v2.X, i * v2.Y);
-        static public VectorInt2 operator/ (VectorInt2 v1, int i) =>
+        static public VectorInt2 operator /(VectorInt2 v1, int i) =>
             new VectorInt2(v1.X / i, v1.Y / i);
     }
 
-    class Maxer<T> where T:IComparable<T> {
+    class Maxer<T> where T : IComparable<T> {
         public T Value;
 
         public Maxer(T t) {
@@ -141,5 +191,31 @@ namespace AtCoder {
         public void Max(T other) {
             if (Value.CompareTo(other) < 0) Value = other;
         }
+    }
+
+    class MultiSet<T> : IEnumerable<KeyValuePair<T, int>> {
+        Dictionary<T, int> dictionary = new Dictionary<T, int>();
+
+        public MultiSet(IEnumerable<T> data) {
+            foreach (var datum in data) {
+                if (dictionary.ContainsKey(datum)) {
+                    dictionary[datum]++;
+                } else {
+                    dictionary[datum] = 1;
+                }
+            }
+        }
+
+        public int this [T key] {
+            get {
+                return dictionary.ContainsKey(key) ? dictionary[key] : 0;
+            }
+        }
+        public MultiSet() {}
+
+        public Dictionary<T, int> AsDict() => dictionary;
+
+        public IEnumerator<KeyValuePair<T, int>> GetEnumerator() => dictionary.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 }

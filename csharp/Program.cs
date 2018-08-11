@@ -35,9 +35,15 @@ namespace AtCoder {
         public static long Inc(long i) => i + 1;
         public static long Dec(long i) => i - 1;
         public static long Plus(long i, long j) => i + j;
+        public static Func<long, long> Plus(long j) => i => i + j;
         public static long Minus(long i, long j) => i - j;
+        public static Func<long, long> Minus(long j) => i => i - j;
         public static long Multiply(long i, long j) => i * j;
+        public static Func<long, long> Multiply(long j) => i => i * j;
         public static long Divide(long i, long j) => j / j;
+        public static Func<long, long> Divide(long j) => i => i * j;
+        public static long Mod(long i, long j) => i % j;
+        public static Func<long, long> Mod(long j) => i => i % j;
     }
 
     static class Util {
@@ -98,6 +104,9 @@ namespace AtCoder {
         public static IEnumerable<T> Times<T>(this long n, Func<T> func) {
             for (long i = 0; i < n; i++) yield return func();
         }
+
+        public static Func<S, U> Then<S, T, U>(this Func<S, T> f, Func<T, U> g) => x => g(f(x));
+        public static Func<S, U> Compose<S, T, U>(this Func<T, U> f, Func<S, T> g) => x => f(g(x));
 
         public static void Call<T>(this T t, Action<T> action) => action(t);
         public static bool In<T>(this T t, IEnumerable<T> range) =>

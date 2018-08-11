@@ -8,12 +8,17 @@ using static System.Console;
 using static AtCoder.Util;
 using static AtCoder.Cin;
 using static System.Math;
+using static AtCoder.MyMath;
 
 namespace AtCoder {
     class Program {
         static void Main() {
-            var x = ReadInt();
-            FromTo(1, x).Where(z => z.Factors().Distinct().Count() <= 1).Last().Call(WriteLine);
+            var n = ReadLong();
+            var m = ReadLong();
+            var a = ReadLong(n);
+
+            a.Scan0(0, (long sum, long x) =>(sum + x) % m)
+                .ToMultiSet().Sum(x => nCr(x.Value, 2)).WriteLine();
         }
     }
 }
@@ -21,6 +26,20 @@ namespace AtCoder {
 /* ***************** Following Contents are my common library ******** */
 
 namespace AtCoder {
+
+    static class MyMath {
+        public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Multiply);
+        public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x =>(long) x).Aggregate(1L, Multiply);
+        public static long nCr(int n, int r) => nPr(n, r) / Factorial(r);
+
+        public static long Inc(long i) => i + 1;
+        public static long Dec(long i) => i - 1;
+        public static long Plus(long i, long j) => i + j;
+        public static long Minus(long i, long j) => i - j;
+        public static long Multiply(long i, long j) => i * j;
+        public static long Divide(long i, long j) => j / j;
+    }
+
     static class Util {
         public static IEnumerable<int> Factors(this int n) {
             for (int i = 1; i <= n; i++)
@@ -34,7 +53,6 @@ namespace AtCoder {
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 
         public static MultiSet<T> ToMultiSet<T>(this IEnumerable<T> t) => new MultiSet<T>(t);
-        public static int Plus(this int i, int j) => i + j;
 
         public static int Max(this int i, int j) => i > j ? i : j;
 
@@ -99,6 +117,19 @@ namespace AtCoder {
         public static IEnumerable<T> Cycle<T>(IEnumerable<T> e) {
             while (true)
                 foreach (var v in e) yield return v;
+        }
+
+        public static IEnumerable<T> Scan<S, T>(this IEnumerable<S> source, T init, Func<T, S, T> accumulator) {
+            var result = init;
+            foreach (var item in source) {
+                result = accumulator(result, item);
+                yield return result;
+            }
+        }
+
+        public static IEnumerable<T> Scan0<S, T>(this IEnumerable<S> source, T init, Func<T, S, T> accumulator) {
+            yield return init;
+            foreach (var item in Scan(source, init, accumulator)) yield return item;
         }
 
         public static VectorInt2 ReadVectorInt2() =>
@@ -212,6 +243,8 @@ namespace AtCoder {
             }
         }
         public MultiSet() {}
+
+        public static MultiSet<S> ToMultiSet<S>(IEnumerable<S> source) => new MultiSet<S>(source);
 
         public Dictionary<T, int> AsDict() => dictionary;
 

@@ -13,12 +13,13 @@ using static AtCoder.MyMath;
 namespace AtCoder {
     class Program {
         static void Main() {
-            var n = ReadLong();
-            var m = ReadLong();
-            var a = ReadLong(n);
-
-            a.Scan0(0, (long sum, long x) =>(sum + x) % m)
-                .ToMultiSet().Sum(x => nCr(x.Value, 2)).WriteLine();
+            var s = ReadString();
+            var condition = true;
+            condition &= s[0] == 'A';
+            condition &= s.Where(char.IsUpper).Count() == 2;
+            var index = s.ToList().FindIndex(x => x == 'C');
+            condition &= 2 <= index && index <= s.Length - 2;
+            (condition ? "AC" : "WA").WriteLine();
         }
     }
 }
@@ -44,9 +45,15 @@ namespace AtCoder {
         public static Func<long, long> Divide(long j) => i => i * j;
         public static long Mod(long i, long j) => i % j;
         public static Func<long, long> Mod(long j) => i => i % j;
+
+        public static long Max(params long[] ns) => ns.Max();
     }
 
     static class Util {
+
+        public static IEnumerable<int> ToDigits(this long n) =>
+            n.ToString().Select(x => x.ToInt());
+
         public static IEnumerable<int> Factors(this int n) {
             for (int i = 1; i <= n; i++)
                 if (n % i == 0) yield return i;
@@ -55,6 +62,8 @@ namespace AtCoder {
         public static IEnumerable<int> Natural() {
             for (int i = 0;; i++) yield return i;
         }
+        public static IEnumerable<int> Positive() => Natural().Skip(1);
+
         public static int Pow(int i, int exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 
@@ -123,7 +132,7 @@ namespace AtCoder {
         }
         public static IEnumerable<T> Replicate<T>(int n, T t) => Repeat(t).Take(n);
 
-        public static IEnumerable<T> Cycle<T>(IEnumerable<T> e) {
+        public static IEnumerable<T> Cycle<T>(this IEnumerable<T> e) {
             while (true)
                 foreach (var v in e) yield return v;
         }
@@ -196,6 +205,8 @@ namespace AtCoder {
             n.Times(() => list.Add(ReadString()));
             return list;
         }
+
+        static public void SayYesNo(this bool b) =>(b ? "Yes" : "No").WriteLine();
     }
 
     struct VectorInt2 {

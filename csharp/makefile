@@ -2,11 +2,11 @@ MAIN = main
 CLIPBOARD = xsel --clipboard --output
 
 .PHONY: run clean
-run: build
-	$(CLIPBOARD) |  time -p dotnet run --no-build
+run: Program.exe
+	$(CLIPBOARD) | time -f "elapsed: %e[sec]" ./Program.exe
 
-build: Program.cs
-	dotnet build
+Program.exe : Program.cs
+	csc Program.cs
 
 clean:
-	dotnet clean
+	- rm Program.exe

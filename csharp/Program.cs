@@ -13,13 +13,9 @@ using static AtCoder.MyMath;
 namespace AtCoder {
     class Program {
         static void Main() {
-            var s = ReadString();
-            var condition = true;
-            condition &= s[0] == 'A';
-            condition &= s.Where(char.IsUpper).Count() == 2;
-            var index = s.ToList().FindIndex(x => x == 'C');
-            condition &= 2 <= index && index <= s.Length - 2;
-            (condition ? "AC" : "WA").WriteLine();
+            var d = ReadInt();
+            var n = ReadInt();
+            Positive().Where(x => x % Pow(100, d) == 0).Where(x => x % Pow(100, d + 1) != 0).Skip(n - 1).First().WriteLine();
         }
     }
 }

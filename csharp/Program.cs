@@ -13,9 +13,38 @@ using static AtCoder.MyMath;
 namespace AtCoder {
     class Program {
         static void Main() {
-            var d = ReadInt();
             var n = ReadInt();
-            Positive().Where(x => x % Pow(100, d) == 0).Where(x => x % Pow(100, d + 1) != 0).Skip(n - 1).First().WriteLine();
+            var a = ReadInt();
+            var b = ReadInt();
+            var s = ReadString();
+
+            var passed = 0;
+            var foreigners = 0;
+            foreach (var c in s) {
+                switch (c) {
+                    case 'c':
+                        WriteLine("No");
+                        break;
+                    case 'b':
+                        if (passed < a + b && foreigners < b) {
+                            WriteLine("Yes");
+                            passed++;
+                        } else {
+                            WriteLine("No");
+                        }
+                        foreigners++;
+                        break;
+                    case 'a':
+                        if (passed < a + b) {
+                            WriteLine("Yes");
+                            passed++;
+                        } else {
+                            WriteLine("No");
+                        }
+                        break;
+                }
+
+            }
         }
     }
 }
@@ -25,6 +54,12 @@ namespace AtCoder {
 namespace AtCoder {
 
     static class MyMath {
+        public static long ToNearestInt(this double d) {
+            var l = (long) Math.Floor(d);
+            var r = l + 1;
+            return r - d < d - l ? r : l;
+        }
+
         public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Multiply);
         public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x =>(long) x).Aggregate(1L, Multiply);
         public static long nCr(int n, int r) => nPr(n, r) / Factorial(r);
@@ -43,12 +78,21 @@ namespace AtCoder {
         public static Func<long, long> Mod(long j) => i => i % j;
 
         public static long Max(params long[] ns) => ns.Max();
+
+        public static bool InRange(this long x, long min, long max) => min <= x && x <= max;
+        public static bool IsEven(this int x) => x % 2 == 0;
+        public static bool IsOdd(this int x) => x % 2 != 1;
+        public static bool IsEven(this long x) => x % 2 == 0;
+        public static bool IsOdd(this long x) => x % 2 != 1;
     }
 
     static class Util {
 
+        public static string Show(this IEnumerable<char> source) => new string(source.ToArray());
+
         public static IEnumerable<int> ToDigits(this long n) =>
             n.ToString().Select(x => x.ToInt());
+        public static IEnumerable<int> ToDigits(this int n) =>((long) n).ToDigits();
 
         public static IEnumerable<int> Factors(this int n) {
             for (int i = 1; i <= n; i++)
@@ -60,7 +104,7 @@ namespace AtCoder {
         }
         public static IEnumerable<int> Positive() => Natural().Skip(1);
 
-        public static int Pow(int i, int exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
+        public static long Pow(long i, long exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 
         public static MultiSet<T> ToMultiSet<T>(this IEnumerable<T> t) => new MultiSet<T>(t);
@@ -122,6 +166,8 @@ namespace AtCoder {
             foreach (var v in e) action(v);
         }
 
+        public static long Prod(this IEnumerable<long> source) => source.Aggregate(Multiply);
+
         public static IEnumerable<int> FromTo(int a, int b) => Range(a, Max(b - a + 1, 0));
         public static IEnumerable<T> Repeat<T>(T t) {
             while (true) yield return t;
@@ -141,9 +187,30 @@ namespace AtCoder {
             }
         }
 
+        public static T[] ToArray<T>(params T[] ns) => ns;
+        public static List<T> ToList<T>(params T[] ns) => ns.ToList();
+
         public static IEnumerable<T> Scan0<S, T>(this IEnumerable<S> source, T init, Func<T, S, T> accumulator) {
             yield return init;
             foreach (var item in Scan(source, init, accumulator)) yield return item;
+        }
+
+        public static IEnumerable<List<T>> Buffer<T>(this IEnumerable<T> source, int length) {
+            while (source.Any()) {
+                yield return source.Take(length).ToList();
+                source = source.Skip(length);
+            }
+        }
+
+        public static IEnumerable<List<T>> ChunkBy<T>(this IEnumerable<T> source) => ChunkBy(source, Id, EqualityComparer<T>.Default);
+        public static IEnumerable<List<T>> ChunkBy<S, T>(this IEnumerable<T> source, Func<T, S> selector) => ChunkBy(source, selector, EqualityComparer<S>.Default);
+        public static IEnumerable<List<T>> ChunkBy<S, T>(this IEnumerable<T> source, Func<T, S> selector, IEqualityComparer<S> comparer) {
+            while (source.Any()) {
+                var v = selector(source.First());
+                var l = source.TakeWhile(x => comparer.Equals(selector(x), v)).ToList();
+                yield return l;
+                source = source.Skip(l.Count());
+            }
         }
 
         public static VectorInt2 ReadVectorInt2() =>
@@ -184,19 +251,19 @@ namespace AtCoder {
         }
 
         static public int ReadInt() => int.Parse(tokens.Dequeue());
-        static public IList<int> ReadInt(long n) {
+        static public List<int> ReadInt(long n) {
             var list = new List<int>();
             n.Times(() => list.Add(ReadInt()));
             return list;
         }
         static public long ReadLong() => long.Parse(tokens.Dequeue());
-        static public IList<long> ReadLong(long n) {
+        static public List<long> ReadLong(long n) {
             var list = new List<long>();
             n.Times(() => list.Add(ReadLong()));
             return list;
         }
         static public string ReadString() => tokens.Dequeue();
-        static public IList<string> ReadString(long n) {
+        static public List<string> ReadString(long n) {
             var list = new List<string>();
             n.Times(() => list.Add(ReadString()));
             return list;

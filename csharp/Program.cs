@@ -4,47 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+//using static System.Linq.Enumerable;
 using static System.Console;
 using static AtCoder.Util;
 using static AtCoder.Cin;
 using static System.Math;
 using static AtCoder.MyMath;
 
+// 123456789012345e8987wdjkhfaksjhfljkdshfjkashdfjkhnjkfhldsuifjhsajidkhfldasjhfiejkhwfaeuihlui678901234567890 12
+
 namespace AtCoder {
     class Program {
         static void Main() {
             var n = ReadInt();
-            var a = ReadInt();
-            var b = ReadInt();
-            var s = ReadString();
-
-            var passed = 0;
-            var foreigners = 0;
-            foreach (var c in s) {
-                switch (c) {
-                    case 'c':
-                        WriteLine("No");
-                        break;
-                    case 'b':
-                        if (passed < a + b && foreigners < b) {
-                            WriteLine("Yes");
-                            passed++;
-                        } else {
-                            WriteLine("No");
-                        }
-                        foreigners++;
-                        break;
-                    case 'a':
-                        if (passed < a + b) {
-                            WriteLine("Yes");
-                            passed++;
-                        } else {
-                            WriteLine("No");
-                        }
-                        break;
-                }
-
-            }
+            var k = ReadLong();
+            var a = ReadLong(n);
+            a.Sort();
+            WriteLine(a.Take((int) k).Sum() + k * (k - 1) / 2);
         }
     }
 }
@@ -79,6 +55,14 @@ namespace AtCoder {
 
         public static long Max(params long[] ns) => ns.Max();
 
+        public static long LowerBound(this long m, long lbound) => Max(m, lbound);
+        public static long UpperBound(this long m, long ubound) => Min(m, ubound);
+        public static long Bound(this long m, long lowerBound, long UpperBound) => m.LowerBound(lowerBound).UpperBound(UpperBound);
+
+        public static long LowerBound(this int m, long lbound) => Max(m, lbound);
+        public static long UpperBound(this int m, long ubound) => Min(m, ubound);
+        public static long Bound(this int m, long lowerBound, long UpperBound) => m.LowerBound(lowerBound).UpperBound(UpperBound);
+
         public static bool InRange(this long x, long min, long max) => min <= x && x <= max;
         public static bool IsEven(this int x) => x % 2 == 0;
         public static bool IsOdd(this int x) => x % 2 != 1;
@@ -108,8 +92,6 @@ namespace AtCoder {
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 
         public static MultiSet<T> ToMultiSet<T>(this IEnumerable<T> t) => new MultiSet<T>(t);
-
-        public static int Max(this int i, int j) => i > j ? i : j;
 
         public static bool IsPalindrome(string s) {
             for (int i = 0; i < s.Length / 2; i++) {
@@ -195,11 +177,34 @@ namespace AtCoder {
             foreach (var item in Scan(source, init, accumulator)) yield return item;
         }
 
+        public static IEnumerable<Tuple<T1, T2>> Cartesian<T1, T2>(IEnumerable<T1> s1, IEnumerable<T2> s2) =>
+            from v1 in s1 from v2 in s2 select new Tuple<T1, T2>(v1, v2);
+
+        public static IEnumerable<Tuple<T1, T2, T3>> Cartesian<T1, T2, T3>(IEnumerable<T1> s1, IEnumerable<T2> s2, IEnumerable<T3> s3) =>
+            from v1 in s1 from v2 in s2 from v3 in s3 select new Tuple<T1, T2, T3>(v1, v2, v3);
+
+        public static IEnumerable<Tuple<T1, T2, T3, T4>> Cartesian<T1, T2, T3, T4>(IEnumerable<T1> s1, IEnumerable<T2> s2, IEnumerable<T3> s3, IEnumerable<T4> s4) =>
+            from v1 in s1 from v2 in s2 from v3 in s3 from v4 in s4 select new Tuple<T1, T2, T3, T4>(v1, v2, v3, v4);
+
         public static IEnumerable<List<T>> Buffer<T>(this IEnumerable<T> source, int length) {
             while (source.Any()) {
                 yield return source.Take(length).ToList();
                 source = source.Skip(length);
             }
+        }
+
+        public static T MaxBy<T>(this IEnumerable<T> source, Func<T, long> selector) {
+            T max = source.First();
+            foreach (var item in source)
+                if (selector(item) > selector(max)) max = item;
+            return max;
+        }
+
+        public static T MinBy<T>(this IEnumerable<T> source, Func<T, long> selector) {
+            T min = source.First();
+            foreach (var item in source)
+                if (selector(item) < selector(min)) min = item;
+            return min;
         }
 
         public static IEnumerable<List<T>> ChunkBy<T>(this IEnumerable<T> source) => ChunkBy(source, Id, EqualityComparer<T>.Default);
@@ -316,6 +321,17 @@ namespace AtCoder {
                     dictionary[datum]++;
                 } else {
                     dictionary[datum] = 1;
+                }
+            }
+        }
+
+        public bool Contains(T t) => dictionary.ContainsKey(t);
+
+        public void RemoveIfAny(T t) {
+            if (dictionary.ContainsKey(t)) {
+                dictionary[t]--;
+                if (dictionary[t] == 0) {
+                    dictionary.Remove(t);
                 }
             }
         }

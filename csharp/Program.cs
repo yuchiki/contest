@@ -10,19 +10,15 @@ using static AtCoder.Util;
 using static AtCoder.Cin;
 using static System.Math;
 using static AtCoder.MyMath;
-
-// 123456789012345e8987wdjkhfaksjhfljkdshfjkashdfjkhnjkfhldsuifjhsajidkhfldasjhfiejkhwfaeuihlui678901234567890 12
+using static AtCoder.StreamExtensions;
 
 namespace AtCoder {
-    class Program {
+    static class Program {
         static void Main() {
-            var n = ReadInt();
-            var k = ReadLong();
-            var a = ReadLong(n);
-            a.Sort();
-            WriteLine(a.Take((int) k).Sum() + k * (k - 1) / 2);
+
         }
     }
+
 }
 
 /* ***************** Following Contents are my common library ******** */
@@ -65,14 +61,9 @@ namespace AtCoder {
 
         public static bool InRange(this long x, long min, long max) => min <= x && x <= max;
         public static bool IsEven(this int x) => x % 2 == 0;
-        public static bool IsOdd(this int x) => x % 2 != 1;
+        public static bool IsOdd(this int x) => x % 2 != 0;
         public static bool IsEven(this long x) => x % 2 == 0;
-        public static bool IsOdd(this long x) => x % 2 != 1;
-    }
-
-    static class Util {
-
-        public static string Show(this IEnumerable<char> source) => new string(source.ToArray());
+        public static bool IsOdd(this long x) => x % 2 != 0;
 
         public static IEnumerable<int> ToDigits(this long n) =>
             n.ToString().Select(x => x.ToInt());
@@ -89,6 +80,12 @@ namespace AtCoder {
         public static IEnumerable<int> Positive() => Natural().Skip(1);
 
         public static long Pow(long i, long exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
+
+    }
+
+    static class Util {
+
+        public static string Show(this IEnumerable<char> source) => new string(source.ToArray());
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
 
         public static MultiSet<T> ToMultiSet<T>(this IEnumerable<T> t) => new MultiSet<T>(t);
@@ -122,6 +119,47 @@ namespace AtCoder {
         public static long ToLong(this char c) => c - '0';
         public static int ToInt(this String s) => int.Parse(s);
         public static int ToInt(this char c) => c - '0';
+
+        public static VectorInt2 ReadVectorInt2() =>
+            new VectorInt2(ReadInt(), ReadInt());
+
+        public static string ReplaceX(this string input, string pattern, string replace) =>
+            Regex.Replace(input, pattern, replace);
+
+        public static IEnumerable<int> Range(int i, int j) => Enumerable.Range(i, j);
+        public static IEnumerable<long> Range(long i, long j) {
+            for (long k = i; k < i + j; k++) yield return k;
+
+        }
+        public static void Swap<T>(this IList<T> enumerable, int i, int j) {
+            var buf = enumerable[i];
+            enumerable[i] = enumerable[j];
+            enumerable[j] = buf;
+
+        }
+
+        public static bool In<T>(this T t, IEnumerable<T> range) => range.Contains(t);
+
+    }
+
+    static class ParametricExtensions {
+        public static Func<S, U> Then<S, T, U>(this Func<S, T> f, Func<T, U> g) => x => g(f(x));
+        public static Func<S, U> Compose<S, T, U>(this Func<T, U> f, Func<S, T> g) => x => f(g(x));
+
+        public static void Call<T>(this T t, Action<T> action) => action(t);
+        public static void WriteLine<T>(this T t) => Console.WriteLine(t);
+        public static T Call<S, T>(this S s, Func<S, T> func) => func(s);
+
+    }
+
+    static class StreamExtensions {
+
+        public static void ReverseRange<T>(this IList<T> enumerable, int i, int j) {
+            int half = (j - i) / 2;
+            for (int k = 0; k <= half; k++) enumerable.Swap(i + k, j - k);
+        }
+
+        public static bool isEmpty<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
         public static void Times(this int n, Action action) {
             for (int i = 0; i < n; i++) action();
         }
@@ -136,18 +174,9 @@ namespace AtCoder {
             for (long i = 0; i < n; i++) yield return func();
         }
 
-        public static Func<S, U> Then<S, T, U>(this Func<S, T> f, Func<T, U> g) => x => g(f(x));
-        public static Func<S, U> Compose<S, T, U>(this Func<T, U> f, Func<S, T> g) => x => f(g(x));
-
-        public static void Call<T>(this T t, Action<T> action) => action(t);
-        public static bool In<T>(this T t, IEnumerable<T> range) =>
-            range.Contains(t);
-        public static void WriteLine<T>(this T t) => Console.WriteLine(t);
-        public static T Call<S, T>(this S s, Func<S, T> func) => func(s);
-        public static void Each<T>(this IEnumerable<T> e, Action<T> action) {
+        public static void ForEach<T>(this IEnumerable<T> e, Action<T> action) {
             foreach (var v in e) action(v);
         }
-
         public static long Prod(this IEnumerable<long> source) => source.Aggregate(Multiply);
 
         public static IEnumerable<int> FromTo(int a, int b) => Range(a, Max(b - a + 1, 0));
@@ -207,6 +236,13 @@ namespace AtCoder {
             return min;
         }
 
+        public static int IndexOf<T>(this IList<T> source, Func<T, bool> condition) {
+            for (int i = 0; i < source.Count; i++)
+                if (condition(source[i]))
+                    return i;
+
+            return -1;
+        }
         public static IEnumerable<List<T>> ChunkBy<T>(this IEnumerable<T> source) => ChunkBy(source, Id, EqualityComparer<T>.Default);
         public static IEnumerable<List<T>> ChunkBy<S, T>(this IEnumerable<T> source, Func<T, S> selector) => ChunkBy(source, selector, EqualityComparer<S>.Default);
         public static IEnumerable<List<T>> ChunkBy<S, T>(this IEnumerable<T> source, Func<T, S> selector, IEqualityComparer<S> comparer) {
@@ -217,40 +253,16 @@ namespace AtCoder {
                 source = source.Skip(l.Count());
             }
         }
-
-        public static VectorInt2 ReadVectorInt2() =>
-            new VectorInt2(ReadInt(), ReadInt());
-
-        public static string ReplaceX(this string input, string pattern, string replace) =>
-            Regex.Replace(input, pattern, replace);
-
-        public static IEnumerable<int> Range(int i, int j) => Enumerable.Range(i, j);
-        public static IEnumerable<long> Range(long i, long j) {
-            for (long k = i; k < i + j; k++) yield return k;
-
-        }
-        public static void Swap<T>(this IList<T> enumerable, int i, int j) {
-            var buf = enumerable[i];
-            enumerable[i] = enumerable[j];
-            enumerable[j] = buf;
-
-        }
-        public static void ReverseRange<T>(this IList<T> enumerable, int i, int j) {
-            int half = (j - i) / 2;
-            for (int k = 0; k <= half; k++) enumerable.Swap(i + k, j - k);
-        }
-
-        public static bool isEmpty<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
     }
 
     static class Cin {
         private static Queue<string> tokens;
         static Cin() {
-        string line;
-        tokens = new Queue<string>();
-        while ((line = Console.ReadLine()) != null) {
-        foreach (var token in line.Split(' ')) {
-        tokens.Enqueue(token);
+            string line;
+            tokens = new Queue<string>();
+            while ((line = Console.ReadLine()) != null) {
+                foreach (var token in line.Split(' ')) {
+                    tokens.Enqueue(token);
                 }
             }
         }
@@ -298,18 +310,8 @@ namespace AtCoder {
             new VectorInt2(i * v2.X, i * v2.Y);
         static public VectorInt2 operator /(VectorInt2 v1, int i) =>
             new VectorInt2(v1.X / i, v1.Y / i);
-    }
 
-    class Maxer<T> where T : IComparable<T> {
-        public T Value;
-
-        public Maxer(T t) {
-            Value = t;
-        }
-
-        public void Max(T other) {
-            if (Value.CompareTo(other) < 0) Value = other;
-        }
+        public override string ToString() => $"({X}, {Y})";
     }
 
     class MultiSet<T> : IEnumerable<KeyValuePair<T, int>> {

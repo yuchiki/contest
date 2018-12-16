@@ -11,29 +11,55 @@ using static AtCoder.Cin;
 using static System.Math;
 using static AtCoder.MyMath;
 using static AtCoder.StreamExtensions;
+using static AtCoder.Matrix;
 
 namespace AtCoder {
+    using VI = VectorInt2;
+
     static class Program {
         static void Main() {
+            var n = ReadInt();
+            var k = ReadLong();
+            var dict = n
+                .Times(() => new KeyValuePair<int, long>(ReadInt(), ReadInt()))
+                .ToSortedMultiSet();
 
+            foreach (var key in dict.Keys) {
+                k -= dict[key];
+                if (k <= 0) {
+                    key.WriteLine();
+                    return;
+                }
+            }
         }
-    }
 
+    }
 }
 
 /* ***************** Following Contents are my common library ******** */
 
 namespace AtCoder {
+    static class Algorithm {
+
+        public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, long width) => BinSearch(range, isBigger, x => range.Right - range.Left < width);
+        public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, Func<LongRange, bool> stopCondition) {
+            if (stopCondition(range)) return range;
+            var middle = range.Left + (range.Right - range.Left) / 2;
+            return isBigger(middle) ? BinSearch(new LongRange(range.Left, middle), isBigger, stopCondition)
+                : BinSearch(new LongRange(middle, range.Right), isBigger, stopCondition);
+
+        }
+    }
 
     static class MyMath {
-        public static long ToNearestInt(this double d) {
-            var l = (long) Math.Floor(d);
-            var r = l + 1;
-            return r - d < d - l ? r : l;
-        }
+
+        public static long GCD(long a, long b) =>
+            a < b ? GCD(b, a)
+            : b > 0 ? GCD(b, a % b)
+            : a;
 
         public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Multiply);
-        public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x =>(long) x).Aggregate(1L, Multiply);
+        public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x => (long) x).Aggregate(1L, Multiply);
         public static long nCr(int n, int r) => nPr(n, r) / Factorial(r);
 
         public static long Inc(long i) => i + 1;
@@ -67,10 +93,15 @@ namespace AtCoder {
 
         public static IEnumerable<int> ToDigits(this long n) =>
             n.ToString().Select(x => x.ToInt());
-        public static IEnumerable<int> ToDigits(this int n) =>((long) n).ToDigits();
+        public static IEnumerable<int> ToDigits(this int n) => ((long) n).ToDigits();
 
         public static IEnumerable<int> Factors(this int n) {
             for (int i = 1; i <= n; i++)
+                if (n % i == 0) yield return i;
+        }
+
+        public static IEnumerable<long> Factors(this long n) {
+            for (long i = 1; i <= n; i++)
                 if (n % i == 0) yield return i;
         }
 
@@ -79,11 +110,22 @@ namespace AtCoder {
         }
         public static IEnumerable<int> Positive() => Natural().Skip(1);
 
-        public static long Pow(long i, long exp) =>(exp == 0) ? 1 : i * Pow(i, exp - 1);
+        public static long Pow(this long i, long exp) => (exp == 0) ? 1 : i * Pow(i, exp - 1);
+        public static long Pow(this int i, long exp) => (exp == 0) ? 1 : i * Pow(i, exp - 1);
+
+        public static int IntLog(this long n, long baseNum) {
+            int count = 0;
+            while (n > 1) {
+                n /= baseNum;
+                count++;
+            }
+            return count;
+        }
 
     }
 
     static class Util {
+        public static InvalidOperationException UnreachableException = new InvalidOperationException("unreachable.");
 
         public static string Show(this IEnumerable<char> source) => new string(source.ToArray());
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
@@ -123,6 +165,9 @@ namespace AtCoder {
         public static VectorInt2 ReadVectorInt2() =>
             new VectorInt2(ReadInt(), ReadInt());
 
+        public static VectorDouble2 ReadVectorDouble2() =>
+            new VectorDouble2(ReadInt(), ReadInt());
+
         public static string ReplaceX(this string input, string pattern, string replace) =>
             Regex.Replace(input, pattern, replace);
 
@@ -148,7 +193,10 @@ namespace AtCoder {
 
         public static void Call<T>(this T t, Action<T> action) => action(t);
         public static void WriteLine<T>(this T t) => Console.WriteLine(t);
+        public static void Write<T>(this T t) => Console.Write(t);
         public static T Call<S, T>(this S s, Func<S, T> func) => func(s);
+
+        public static S Call<S>(this S s, Func<S, S> func, int times) => times == 0 ? s : Call(func(s), func, times - 1);
 
     }
 
@@ -200,6 +248,15 @@ namespace AtCoder {
 
         public static T[] ToArray<T>(params T[] ns) => ns;
         public static List<T> ToList<T>(params T[] ns) => ns.ToList();
+
+        public static Dictionary<T1, T2> ToDictionary<T1, T2>(this IEnumerable<KeyValuePair<T1, T2>> source) {
+            var dict = new Dictionary<T1, T2>();
+            source.ForEach(x => dict.Add(x.Key, x.Value));
+            return dict;
+        }
+        public static SortedDictionary<T1, T2> ToSortedDictionary<T1, T2>(this IEnumerable<KeyValuePair<T1, T2>> source) => new SortedDictionary<T1, T2>(source.ToDictionary());
+        public static MultiSet<T> ToMultiSet<T>(this IEnumerable<KeyValuePair<T, long>> source) => new MultiSet<T>(source);
+        public static SortedMultiSet<T> ToSortedMultiSet<T>(this IEnumerable<KeyValuePair<T, long>> source) => new SortedMultiSet<T>(source);
 
         public static IEnumerable<T> Scan0<S, T>(this IEnumerable<S> source, T init, Func<T, S, T> accumulator) {
             yield return init;
@@ -255,6 +312,19 @@ namespace AtCoder {
         }
     }
 
+    static class Matrix {
+        public static List<List<T>> Transpose<T>(this List<List<T>> source) =>
+            Range(0, source[0].Count).Select(i => source.Select(x => x[i]).ToList()).ToList();
+
+        public static void WriteMatrix(this IEnumerable<IEnumerable<char>> source) {
+            foreach (var line in source) line.Show().WriteLine();
+        }
+
+        public static List<List<long>> ReadLongMatrix(int h, int w) => h.Times(() => ReadLong(w)).ToList();
+
+        public static List<List<T>> SelectMatrix<S, T>(this List<List<S>> source, Func<S, T> f) => source.Select(x => x.Select(f).ToList()).ToList();
+    }
+
     static class Cin {
         private static Queue<string> tokens;
         static Cin() {
@@ -286,10 +356,12 @@ namespace AtCoder {
             return list;
         }
 
-        static public void SayYesNo(this bool b) =>(b ? "Yes" : "No").WriteLine();
+        static public void SayYesNo(this bool b) => (b ? "Yes" : "No").WriteLine();
+        static public void SayYESNO(this bool b) => (b ? "YES" : "NO").WriteLine();
+
     }
 
-    struct VectorInt2 {
+    public struct VectorInt2 {
         public int X { get; set; }
         public int Y { get; set; }
 
@@ -314,42 +386,257 @@ namespace AtCoder {
         public override string ToString() => $"({X}, {Y})";
     }
 
-    class MultiSet<T> : IEnumerable<KeyValuePair<T, int>> {
-        Dictionary<T, int> dictionary = new Dictionary<T, int>();
+    struct VectorDouble2 {
+        public double X { get; set; }
+        public double Y { get; set; }
 
-        public MultiSet(IEnumerable<T> data) {
-            foreach (var datum in data) {
-                if (dictionary.ContainsKey(datum)) {
-                    dictionary[datum]++;
-                } else {
-                    dictionary[datum] = 1;
+        public VectorDouble2(double x, double y) {
+            X = x;
+            Y = y;
+        }
+
+        static public VectorDouble2 operator +(VectorDouble2 v1, VectorDouble2 v2) =>
+            new VectorDouble2(v1.X + v2.X, v1.Y + v2.Y);
+        static public VectorDouble2 operator -(VectorDouble2 v1, VectorDouble2 v2) =>
+            new VectorDouble2(v1.X - v2.X, v1.Y - v2.Y);
+        static public VectorDouble2 operator *(VectorDouble2 v1, VectorDouble2 v2) =>
+            new VectorDouble2(v1.X * v2.X, v1.Y * v2.Y);
+        static public VectorDouble2 operator *(VectorDouble2 v1, int i) =>
+            new VectorDouble2(v1.X * i, v1.Y * i);
+        static public VectorDouble2 operator *(int i, VectorDouble2 v2) =>
+            new VectorDouble2(i * v2.X, i * v2.Y);
+        static public VectorDouble2 operator /(VectorDouble2 v1, double i) =>
+            new VectorDouble2(v1.X / i, v1.Y / i);
+
+        public override string ToString() => $"({X}, {Y})";
+
+        public VectorDouble2 Turn(double radian) => new VectorDouble2(X * Cos(radian) - Y * Sin(radian), X * Sin(radian) + Y * Cos(radian));
+    }
+
+    public struct LongRange {
+        public long Left;
+        public long Right;
+
+        public LongRange(long left, long right) {
+            Left = left;
+            Right = right;
+        }
+    }
+
+    public struct LongFromToVector {
+        public VectorInt2 Start;
+        public VectorInt2 End;
+        public LongFromToVector(VectorInt2 start, VectorInt2 end) {
+            Start = start;
+            End = end;
+        }
+    }
+}
+
+namespace AtCoder {
+    using System.Collections.Generic;
+    using System.Collections;
+    using System.Linq;
+    using System;
+
+    class MultiSet<T> : ICollection<T> {
+        // TODO: 順番がグチャグチャなので整理する
+        Dictionary<T, long> occurrence;
+
+        public MultiSet() { occurrence = new Dictionary<T, long>(); }
+        public MultiSet(MultiSet<T> source) : this(source.occurrence) {}
+        public MultiSet(Dictionary<T, long> source) {
+            occurrence = new Dictionary<T, long>(source);
+            Validate();
+        }
+
+        public MultiSet(IEnumerable<T> source) {
+            occurrence = new Dictionary<T, long>();
+            AddRange(source);
+        }
+
+        public MultiSet(IEnumerable<KeyValuePair<T, long>> source) {
+            occurrence = new Dictionary<T, long>();
+            foreach (var item in source) this [item.Key] += item.Value;
+        }
+
+        public void Add(T data) {
+            if (!occurrence.ContainsKey(data)) {
+                occurrence[data] = 1;
+                return;
+            }
+            occurrence[data]++;
+        }
+
+        public void Clear() => occurrence.Clear();
+
+        public void Add(T key, int value) {
+            if (value <= 0) throw new ArgumentException();
+            if (!occurrence.ContainsKey(key)) {
+                occurrence[key] = value;
+                return;
+            }
+            occurrence[key] += value;
+        }
+
+        public void Add(KeyValuePair<T, int> pair) => Add(pair.Key, pair.Value);
+
+        public void AddRange(IEnumerable<T> source) =>
+        source.ToList().ForEach(Add);
+
+        public bool Remove(T data) {
+            if (!occurrence.ContainsKey(data)) return false;
+            occurrence[data]--;
+            if (occurrence[data] == 0) occurrence.Remove(data);
+            return true;
+        }
+
+        // IDictionary
+        public long this [T key] {
+            get { return occurrence.ContainsKey(key) ? occurrence[key] : 0; }
+            set {
+                if (value <= 0) throw new ArgumentException();
+                occurrence[key] = value;
+            }
+        }
+
+        public ICollection<T> Keys {
+            get { return occurrence.Keys; }
+        }
+        public ICollection<long> Values {
+            get { return occurrence.Values; }
+        }
+
+        public bool ContainsKey(T key) => occurrence.ContainsKey(key);
+        public bool Contains(T key) => ContainsKey(key);
+        public bool TryGetValue(T key, out long value) {
+            value = this [key];
+            return true;
+        }
+        // /IDictionary
+
+        public long LongCount() => occurrence.Values.Sum();
+        public int Count => (int) occurrence.Values.Sum();
+        public bool IsReadOnly => false;
+        public void CopyTo(T[] array, int index) {
+            foreach (var pair in occurrence) {
+                for (int i = 0; i < pair.Value; i++) {
+                    array[index] = pair.Key;
+                    index++;
                 }
             }
         }
 
-        public bool Contains(T t) => dictionary.ContainsKey(t);
+        public IEnumerator<T> GetEnumerator() {
+            foreach (var pair in occurrence)
+                for (int i = 0; i < pair.Value; i++) yield return pair.Key;
 
-        public void RemoveIfAny(T t) {
-            if (dictionary.ContainsKey(t)) {
-                dictionary[t]--;
-                if (dictionary[t] == 0) {
-                    dictionary.Remove(t);
-                }
-            }
         }
 
-        public int this [T key] {
-            get {
-                return dictionary.ContainsKey(key) ? dictionary[key] : 0;
-            }
-        }
-        public MultiSet() {}
-
-        public static MultiSet<S> ToMultiSet<S>(IEnumerable<S> source) => new MultiSet<S>(source);
-
-        public Dictionary<T, int> AsDict() => dictionary;
-
-        public IEnumerator<KeyValuePair<T, int>> GetEnumerator() => dictionary.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        public void Validate() {
+            if (occurrence.Values.Any(x => x <= 0)) throw new ArgumentException();
+        }
+    }
+
+    class SortedMultiSet<T> : ICollection<T> {
+        // TODO: 順番がグチャグチャなので整理する
+        SortedDictionary<T, long> occurrence;
+
+        public SortedMultiSet() { occurrence = new SortedDictionary<T, long>(); }
+        public SortedMultiSet(SortedMultiSet<T> source) : this(source.occurrence) {}
+        public SortedMultiSet(SortedDictionary<T, long> source) {
+            occurrence = new SortedDictionary<T, long>(source);
+            Validate();
+        }
+
+        public SortedMultiSet(IEnumerable<T> source) {
+            occurrence = new SortedDictionary<T, long>();
+            AddRange(source);
+        }
+
+        public SortedMultiSet(IEnumerable<KeyValuePair<T, long>> source) {
+            occurrence = new SortedDictionary<T, long>();
+            foreach (var item in source) this [item.Key] += item.Value;
+        }
+
+        public void Add(T data) {
+            if (!occurrence.ContainsKey(data)) {
+                occurrence[data] = 1;
+                return;
+            }
+            occurrence[data]++;
+        }
+
+        public void Clear() => occurrence.Clear();
+
+        public void Add(T key, int value) {
+            if (value <= 0) throw new ArgumentException();
+            if (!occurrence.ContainsKey(key)) {
+                occurrence[key] = value;
+                return;
+            }
+            occurrence[key] += value;
+        }
+
+        public long LongCount() => occurrence.Values.Sum();
+        public int Count => (int) occurrence.Values.Sum();
+
+        public void Add(KeyValuePair<T, int> pair) => Add(pair.Key, pair.Value);
+
+        public void AddRange(IEnumerable<T> source) =>
+        source.ToList().ForEach(Add);
+
+        public bool Remove(T data) {
+            if (!occurrence.ContainsKey(data)) return false;
+            occurrence[data]--;
+            if (occurrence[data] == 0) occurrence.Remove(data);
+            return true;
+        }
+
+        // IDictionary
+        public long this [T key] {
+            get {
+                return occurrence.ContainsKey(key) ? occurrence[key] : 0;
+            }
+            set {
+                if (value <= 0) throw new ArgumentException();
+                occurrence[key] = value;
+            }
+        }
+
+        public ICollection<T> Keys => occurrence.Keys;
+        public ICollection<long> Values => occurrence.Values;
+
+        public bool ContainsKey(T key) => occurrence.ContainsKey(key);
+        public bool Contains(T key) => ContainsKey(key);
+        public bool TryGetValue(T key, out long value) {
+            value = this [key];
+            return true;
+        }
+        // /IDictionary
+
+        public bool IsReadOnly => false;
+        public void CopyTo(T[] array, int index) {
+            foreach (var pair in occurrence) {
+                for (int i = 0; i < pair.Value; i++) {
+                    array[index] = pair.Key;
+                    index++;
+                }
+            }
+        }
+
+        public IEnumerator<T> GetEnumerator() {
+            foreach (var pair in occurrence)
+                for (int i = 0; i < pair.Value; i++) yield return pair.Key;
+
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        public void Validate() {
+            if (occurrence.Values.Any(x => x <= 0)) throw new ArgumentException();
+        }
     }
 }

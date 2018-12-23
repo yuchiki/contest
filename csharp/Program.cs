@@ -18,29 +18,17 @@ namespace AtCoder {
 
     static class Program {
         static void Main() {
-            var n = ReadInt();
-            var k = ReadLong();
-            var dict = n
-                .Times(() => new KeyValuePair<int, long>(ReadInt(), ReadInt()))
-                .ToSortedMultiSet();
-
-            foreach (var key in dict.Keys) {
-                k -= dict[key];
-                if (k <= 0) {
-                    key.WriteLine();
-                    return;
-                }
-            }
+            var n = ReadLong();
+            var p = ReadLong();
+            p.Factorize().KeyValuePairs.Select(pair => pair.Key.Pow(pair.Value / n)).Aggregate(1L, (x, y) => x * y).WriteLine();
         }
 
     }
 }
-
 /* ***************** Following Contents are my common library ******** */
 
 namespace AtCoder {
     static class Algorithm {
-
         public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, long width) => BinSearch(range, isBigger, x => range.Right - range.Left < width);
         public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, Func<LongRange, bool> stopCondition) {
             if (stopCondition(range)) return range;
@@ -57,6 +45,15 @@ namespace AtCoder {
             a < b ? GCD(b, a)
             : b > 0 ? GCD(b, a % b)
             : a;
+        public static long GCD(this IEnumerable<long> source) => source.Aggregate(GCD);
+
+        public static long LCM(long a, long b) {
+            var g = GCD(a, b);
+            var a1 = a / g;
+            var b1 = b / g;
+            return g * a1 * b1;
+        }
+        public static long LCM(this IEnumerable<long> source) => source.Aggregate(LCM);
 
         public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Multiply);
         public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x => (long) x).Aggregate(1L, Multiply);
@@ -105,6 +102,18 @@ namespace AtCoder {
                 if (n % i == 0) yield return i;
         }
 
+        public static MultiSet<long> Factorize(this long n) {
+            var factors = new MultiSet<long>();
+            for (long i = 2; i * i <= n; i++) {
+                while (n % i == 0) {
+                    n /= i;
+                    factors[i]++;
+                }
+            }
+            if (n > 1) factors.Add(n);
+            return factors;
+        }
+
         public static IEnumerable<int> Natural() {
             for (int i = 0;; i++) yield return i;
         }
@@ -115,7 +124,7 @@ namespace AtCoder {
 
         public static int IntLog(this long n, long baseNum) {
             int count = 0;
-            while (n > 1) {
+            while (n >= baseNum) {
                 n /= baseNum;
                 count++;
             }
@@ -505,6 +514,12 @@ namespace AtCoder {
         }
         public ICollection<long> Values {
             get { return occurrence.Values; }
+        }
+
+        public IEnumerable<KeyValuePair<T, long>> KeyValuePairs {
+            get {
+                foreach (var pair in occurrence) yield return pair;
+            }
         }
 
         public bool ContainsKey(T key) => occurrence.ContainsKey(key);

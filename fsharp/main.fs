@@ -19,19 +19,44 @@ let readAs f = read() |> f
 let readAs2 f1 f2 = read2 () |> tmap2 f1 f2
 let readAs3 f1 f2  f3 = read3 () |> tmap3 f1 f2 f3
 let readAs4 f1 f2 f3 f4 = read4 () |> tmap4 f1 f2 f3 f4
+
 let readInt () = readAs int
 let readInt2 () = readAs2 int int
 let readInt3 () = readAs3 int int int
 let readInt4 () = readAs4 int int int int
+let readLong () = readAs int64
+let readLong2 () = readAs2 int64 int64
+let readLong3 () = readAs3 int64 int64 int64
+let readLong4 () = readAs4 int64 int64 int64 int64
 let ensmallen l = l % 1000000007L
 let manhattan x y = abs (fst x - fst y) + abs (snd x - snd y)
 let sayYESNO b = if b then puts "YES" else puts "NO"
 let sayYesNo b = if b then puts "Yes" else puts "No"
+let generateSeq n f = seq { for _ in 1 .. n do yield f () }
+
+let assertLength n arr = if Array.length arr = n then arr else failwith "length doesn not match"
+
 
 let toIntArray (s:string) = s.ToCharArray() |> Array.map (fun c -> int c - int '0')
 
+let readIntMatrix h w =
+ generateSeq h (reads >> Array.map int ) |> Seq.toArray
+let readLongMatrix h w =
+ generateSeq h (reads >> Array.map int64) |> Seq.toArray
+
+let bitCount (n : int) =
+    let count2 = n - ((n >>> 1) &&& 0x55555555)
+    let count4 = (count2 &&& 0x33333333) + ((count2 >>> 2) &&& 0x33333333)
+    let count8 = (count4 + (count4 >>> 4)) &&& 0x0f0f0f0f
+    (count8 * 0x01010101) >>> 24
+
 
 // The main contents of this submission are below this line.
-let n = read()
-let fn = toIntArray n |> Array.sum
-int n % fn = 0 |> sayYesNo
+
+let n= readInt ()
+let f = readIntMatrix n 10 |> Array.map (Array.fold (fun (acc :int) (x : int)-> acc  * 2 + x) 0)
+let p = readIntMatrix n 11
+let benefit pattern shop = f.[shop] &&& pattern |> bitCount |> fun x ->  p.[shop].[x]
+let totalBenefit pattern =  seq { 0 .. n - 1 } |> Seq.map (benefit pattern) |> Seq.sum
+
+seq { 1 .. 0b1111111111 } |> Seq.map totalBenefit |> Seq.max |> puts

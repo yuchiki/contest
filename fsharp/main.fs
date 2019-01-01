@@ -53,10 +53,15 @@ let bitCount (n : int) =
 
 // The main contents of this submission are below this line.
 
-let n= readInt ()
-let f = readIntMatrix n 10 |> Array.map (Array.fold (fun (acc :int) (x : int)-> acc  * 2 + x) 0)
-let p = readIntMatrix n 11
-let benefit pattern shop = f.[shop] &&& pattern |> bitCount |> fun x ->  p.[shop].[x]
-let totalBenefit pattern =  seq { 0 .. n - 1 } |> Seq.map (benefit pattern) |> Seq.sum
+let rec iterate f s = s :: iterate f (f s)
 
-seq { 1 .. 0b1111111111 } |> Seq.map totalBenefit |> Seq.max |> puts
+
+
+let n= readInt ()
+
+let dp =  [| for i in 1 ..n -> 0 |]
+
+seq sixes =
+
+for i = 1 to n do
+    f

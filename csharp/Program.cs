@@ -19,12 +19,66 @@ namespace AtCoder {
     static class Program {
         static void Main() {
             var n = ReadLong();
-            var p = ReadLong();
-            p.Factorize().KeyValuePairs.Select(pair => pair.Key.Pow(pair.Value / n)).Aggregate(1L, (x, y) => x * y).WriteLine();
-        }
+            var digits = 12;
+            var OneLetters3 = digits.Times(() => new List<long>()).ToList();
+            var OneLetters5 = digits.Times(() => new List<long>()).ToList();
+            var OneLetters7 = digits.Times(() => new List<long>()).ToList();
+            var TwoLetters35 = digits.Times(() => new List<long>()).ToList();
+            var TwoLetters57 = digits.Times(() => new List<long>()).ToList();
+            var TwoLetters73 = digits.Times(() => new List<long>()).ToList();
+            var ThreeLetters = digits.Times(() => new List<long>()).ToList();
 
+            OneLetters3[1].Add(3);
+            OneLetters5[1].Add(5);
+            OneLetters7[1].Add(7);
+
+            for (int i = 2; i < digits; i++) {
+                foreach (var num in OneLetters3[i - 1]) {
+                    OneLetters3[i].Add(num * 10 + 3);
+                    TwoLetters35[i].Add(num * 10 + 5);
+                    TwoLetters73[i].Add(num * 10 + 7);
+                }
+                foreach (var num in OneLetters5[i - 1]) {
+                    OneLetters5[i].Add(num * 10 + 5);
+                    TwoLetters35[i].Add(num * 10 + 3);
+                    TwoLetters57[i].Add(num * 10 + 7);
+                }
+                foreach (var num in OneLetters7[i - 1]) {
+                    OneLetters7[i].Add(num * 10 + 7);
+                    TwoLetters57[i].Add(num * 10 + 5);
+                    TwoLetters73[i].Add(num * 10 + 3);
+                }
+
+                foreach (var num in TwoLetters35[i - 1]) {
+                    TwoLetters35[i].Add(num * 10 + 3);
+                    TwoLetters35[i].Add(num * 10 + 5);
+                    ThreeLetters[i].Add(num * 10 + 7);
+                }
+
+                foreach (var num in TwoLetters57[i - 1]) {
+                    ThreeLetters[i].Add(num * 10 + 3);
+                    TwoLetters57[i].Add(num * 10 + 5);
+                    TwoLetters57[i].Add(num * 10 + 7);
+                }
+                foreach (var num in TwoLetters73[i - 1]) {
+                    TwoLetters73[i].Add(num * 10 + 3);
+                    ThreeLetters[i].Add(num * 10 + 5);
+                    TwoLetters73[i].Add(num * 10 + 7);
+                }
+
+                foreach (var num in ThreeLetters[i - 1]) {
+                    ThreeLetters[i].Add(num * 10 + 3);
+                    ThreeLetters[i].Add(num * 10 + 5);
+                    ThreeLetters[i].Add(num * 10 + 7);
+                }
+            }
+
+            ThreeLetters.SelectMany(Id).Where(Leq(n)).Count().WriteLine();
+
+        }
     }
 }
+
 /* ***************** Following Contents are my common library ******** */
 
 namespace AtCoder {
@@ -41,6 +95,12 @@ namespace AtCoder {
 
     static class MyMath {
 
+        public static int DivRoundUp(int a, int b) {
+            var q = a / b;
+            if (a % b != 0) q++;
+            return q;
+        }
+
         public static long GCD(long a, long b) =>
             a < b ? GCD(b, a)
             : b > 0 ? GCD(b, a % b)
@@ -55,8 +115,8 @@ namespace AtCoder {
         }
         public static long LCM(this IEnumerable<long> source) => source.Aggregate(LCM);
 
-        public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Multiply);
-        public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x => (long) x).Aggregate(1L, Multiply);
+        public static long Factorial(this long n) => Range(1, n).Aggregate(1L, Mul);
+        public static long nPr(int n, int r) => r < 0 || r > n ? 0 : FromTo(n - r + 1, n).Select(x => (long) x).Aggregate(1L, Mul);
         public static long nCr(int n, int r) => nPr(n, r) / Factorial(r);
 
         public static long Inc(long i) => i + 1;
@@ -65,12 +125,36 @@ namespace AtCoder {
         public static Func<long, long> Plus(long j) => i => i + j;
         public static long Minus(long i, long j) => i - j;
         public static Func<long, long> Minus(long j) => i => i - j;
-        public static long Multiply(long i, long j) => i * j;
-        public static Func<long, long> Multiply(long j) => i => i * j;
-        public static long Divide(long i, long j) => j / j;
-        public static Func<long, long> Divide(long j) => i => i * j;
+        public static long Mul(long i, long j) => i * j;
+        public static Func<long, long> Mul(long j) => i => i * j;
+        public static long Div(long i, long j) => j / j;
+        public static Func<long, long> Div(long j) => i => i * j;
         public static long Mod(long i, long j) => i % j;
         public static Func<long, long> Mod(long j) => i => i % j;
+
+        public static Func<long, bool> Leq(long j) => i => i <= j;
+        public static Func<long, bool> Gt(long j) => i => i > j;
+        public static Func<long, bool> Geq(long j) => i => i >= j;
+        public static Func<long, bool> Eq(long j) => i => i == j;
+        public static Func<long, bool> Neq(long j) => i => i != j;
+
+        public static int Plus(int i, int j) => i + j;
+        public static Func<int, int> Plus(int j) => i => i + j;
+        public static int Minus(int i, int j) => i - j;
+        public static Func<int, int> Minus(int j) => i => i - j;
+        public static int Mul(int i, int j) => i * j;
+        public static Func<int, int> Mul(int j) => i => i * j;
+        public static int Div(int i, int j) => j / j;
+        public static Func<int, int> Div(int j) => i => i * j;
+        public static int Mod(int i, int j) => i % j;
+        public static Func<int, int> Mod(int j) => i => i % j;
+
+        public static Func<int, bool> Lt(int j) => i => i < j;
+        public static Func<int, bool> Leq(int j) => i => i <= j;
+        public static Func<int, bool> Gt(int j) => i => i > j;
+        public static Func<int, bool> Geq(int j) => i => i >= j;
+        public static Func<int, bool> Eq(int j) => i => i == j;
+        public static Func<int, bool> Neq(int j) => i => i != j;
 
         public static long Max(params long[] ns) => ns.Max();
 
@@ -217,6 +301,7 @@ namespace AtCoder {
         }
 
         public static bool isEmpty<T>(this IEnumerable<T> enumerable) => !enumerable.Any();
+
         public static void Times(this int n, Action action) {
             for (int i = 0; i < n; i++) action();
         }
@@ -231,10 +316,15 @@ namespace AtCoder {
             for (long i = 0; i < n; i++) yield return func();
         }
 
+        public static IEnumerable<T> Iterate<T>(this T init, Func<T, T> f) {
+            yield return init;
+            foreach (var item in Iterate(f(init), f)) yield return item;
+        }
+
         public static void ForEach<T>(this IEnumerable<T> e, Action<T> action) {
             foreach (var v in e) action(v);
         }
-        public static long Prod(this IEnumerable<long> source) => source.Aggregate(Multiply);
+        public static long Prod(this IEnumerable<long> source) => source.Aggregate(Mul);
 
         public static IEnumerable<int> FromTo(int a, int b) => Range(a, Max(b - a + 1, 0));
         public static IEnumerable<T> Repeat<T>(T t) {
@@ -280,6 +370,14 @@ namespace AtCoder {
 
         public static IEnumerable<Tuple<T1, T2, T3, T4>> Cartesian<T1, T2, T3, T4>(IEnumerable<T1> s1, IEnumerable<T2> s2, IEnumerable<T3> s3, IEnumerable<T4> s4) =>
             from v1 in s1 from v2 in s2 from v3 in s3 from v4 in s4 select new Tuple<T1, T2, T3, T4>(v1, v2, v3, v4);
+
+        public static IEnumerable<Tuple<int, T>> Enumerate<T>(IEnumerable<T> source) {
+            int i = 0;
+            foreach (var item in source) {
+                yield return new Tuple<int, T>(i, item);
+                i++;
+            }
+        }
 
         public static IEnumerable<List<T>> Buffer<T>(this IEnumerable<T> source, int length) {
             while (source.Any()) {

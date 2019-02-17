@@ -16,66 +16,10 @@ using static AtCoder.Matrix;
 namespace AtCoder {
     using VI = VectorInt2;
 
+    // keyencesds
+
     static class Program {
-        static void Main() {
-            var n = ReadLong();
-            var digits = 12;
-            var OneLetters3 = digits.Times(() => new List<long>()).ToList();
-            var OneLetters5 = digits.Times(() => new List<long>()).ToList();
-            var OneLetters7 = digits.Times(() => new List<long>()).ToList();
-            var TwoLetters35 = digits.Times(() => new List<long>()).ToList();
-            var TwoLetters57 = digits.Times(() => new List<long>()).ToList();
-            var TwoLetters73 = digits.Times(() => new List<long>()).ToList();
-            var ThreeLetters = digits.Times(() => new List<long>()).ToList();
-
-            OneLetters3[1].Add(3);
-            OneLetters5[1].Add(5);
-            OneLetters7[1].Add(7);
-
-            for (int i = 2; i < digits; i++) {
-                foreach (var num in OneLetters3[i - 1]) {
-                    OneLetters3[i].Add(num * 10 + 3);
-                    TwoLetters35[i].Add(num * 10 + 5);
-                    TwoLetters73[i].Add(num * 10 + 7);
-                }
-                foreach (var num in OneLetters5[i - 1]) {
-                    OneLetters5[i].Add(num * 10 + 5);
-                    TwoLetters35[i].Add(num * 10 + 3);
-                    TwoLetters57[i].Add(num * 10 + 7);
-                }
-                foreach (var num in OneLetters7[i - 1]) {
-                    OneLetters7[i].Add(num * 10 + 7);
-                    TwoLetters57[i].Add(num * 10 + 5);
-                    TwoLetters73[i].Add(num * 10 + 3);
-                }
-
-                foreach (var num in TwoLetters35[i - 1]) {
-                    TwoLetters35[i].Add(num * 10 + 3);
-                    TwoLetters35[i].Add(num * 10 + 5);
-                    ThreeLetters[i].Add(num * 10 + 7);
-                }
-
-                foreach (var num in TwoLetters57[i - 1]) {
-                    ThreeLetters[i].Add(num * 10 + 3);
-                    TwoLetters57[i].Add(num * 10 + 5);
-                    TwoLetters57[i].Add(num * 10 + 7);
-                }
-                foreach (var num in TwoLetters73[i - 1]) {
-                    TwoLetters73[i].Add(num * 10 + 3);
-                    ThreeLetters[i].Add(num * 10 + 5);
-                    TwoLetters73[i].Add(num * 10 + 7);
-                }
-
-                foreach (var num in ThreeLetters[i - 1]) {
-                    ThreeLetters[i].Add(num * 10 + 3);
-                    ThreeLetters[i].Add(num * 10 + 5);
-                    ThreeLetters[i].Add(num * 10 + 7);
-                }
-            }
-
-            ThreeLetters.SelectMany(Id).Where(Leq(n)).Count().WriteLine();
-
-        }
+        static void Main() {}
     }
 }
 
@@ -96,6 +40,11 @@ namespace AtCoder {
     static class MyMath {
 
         public static int DivRoundUp(int a, int b) {
+            var q = a / b;
+            if (a % b != 0) q++;
+            return q;
+        }
+        public static long DivRoundUp(long a, long b) {
             var q = a / b;
             if (a % b != 0) q++;
             return q;
@@ -138,6 +87,11 @@ namespace AtCoder {
         public static Func<long, bool> Eq(long j) => i => i == j;
         public static Func<long, bool> Neq(long j) => i => i != j;
 
+        public static int Min(params int[] args) => args.Min();
+        public static int Max(params int[] args) => args.Max();
+        public static long Min(params long[] args) => args.Min();
+        public static long Max(params long[] args) => args.Max();
+
         public static int Plus(int i, int j) => i + j;
         public static Func<int, int> Plus(int j) => i => i + j;
         public static int Minus(int i, int j) => i - j;
@@ -155,8 +109,6 @@ namespace AtCoder {
         public static Func<int, bool> Geq(int j) => i => i >= j;
         public static Func<int, bool> Eq(int j) => i => i == j;
         public static Func<int, bool> Neq(int j) => i => i != j;
-
-        public static long Max(params long[] ns) => ns.Max();
 
         public static long LowerBound(this long m, long lbound) => Max(m, lbound);
         public static long UpperBound(this long m, long ubound) => Min(m, ubound);

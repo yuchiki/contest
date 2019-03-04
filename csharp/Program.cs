@@ -19,27 +19,25 @@ namespace AtCoder {
     static class Program {
         static void Main() {
             var n = ReadInt();
-            var m = ReadInt();
-            var nodes = Range(1, n).Select(x => new UnionFind<int>()).ToList();
-            var bridges = m.Times(() => new {
-                a = ReadInt(), b = ReadInt()
-            }).ToList();
+            var h = ReadInt(n);
+            var currentHeight = new int[n];
 
-            var inconvenience = (long) n * (n - 1) / 2;
-            var inconveniences = new long[m];
+            var pos = 0;
+            var count = 0;
 
-            for (int i = m - 1; i >= 0; i--) {
-                inconveniences[i] = inconvenience;
+            while (pos < n) {
+                if (currentHeight[pos] == h[pos]) {
+                    pos++;
+                    continue;
+                }
 
-                var left = nodes[bridges[i].a - 1];
-                var right = nodes[bridges[i].b - 1];
-
-                var leftSize = left.Size();
-                var rightSize = right.Size();
-                if (UnionFind<int>.Connect(left, right)) inconvenience -= leftSize * rightSize;
+                count++;
+                for (var currentPos = pos; currentPos < n; currentPos++) {
+                    if (currentHeight[currentPos] == h[currentPos]) break;
+                    currentHeight[currentPos]++;
+                }
             }
-
-            inconveniences.ForEach(WriteLine);
+            count.WriteLine();
         }
     }
 }
@@ -335,6 +333,8 @@ namespace AtCoder {
         }
         public static IEnumerable<T> Replicate<T>(int n, T t) => Repeat(t).Take(n);
 
+        public static long SumLong(this IEnumerable<int> source) => source.Select(x => (long) x).Sum();
+
         public static IEnumerable<T> Cycle<T>(this IEnumerable<T> e) {
             while (true)
                 foreach (var v in e) yield return v;
@@ -457,6 +457,12 @@ namespace AtCoder {
         static public List<long> ReadLong(long n) {
             var list = new List<long>();
             n.Times(() => list.Add(ReadLong()));
+            return list;
+        }
+        static public double ReadDouble() => double.Parse(tokens.Dequeue());
+        static public List<double> ReadDouble(long n) {
+            var list = new List<double>();
+            n.Times(() => list.Add(ReadDouble()));
             return list;
         }
         static public string ReadString() => tokens.Dequeue();

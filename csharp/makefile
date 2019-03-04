@@ -1,5 +1,6 @@
 MAIN = main
 CLIPBOARD = xsel --clipboard --output
+COMPILER = mcs
 
 .PHONY: run clean
 run: input.txt Program.exe
@@ -11,7 +12,7 @@ input.txt : .FORCE
 
 Program.exe : Program.cs
 	@ echo "compiling..."
-	@ csc -nologo Program.cs
+	@ $(COMPILER) -nologo Program.cs
 	@ chmod 777 Program.exe
 	@ echo "compiled."
 

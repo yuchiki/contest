@@ -16,16 +16,67 @@ using static AtCoder.Matrix;
 namespace AtCoder {
     using VI = VectorInt2;
 
-    // keyencesds
-
     static class Program {
-        static void Main() {}
+        static void Main() {
+            var n = ReadInt();
+            var m = ReadInt();
+            var nodes = Range(1, n).Select(x => new UnionFind<int>()).ToList();
+            var bridges = m.Times(() => new {
+                a = ReadInt(), b = ReadInt()
+            }).ToList();
+
+            var inconvenience = (long) n * (n - 1) / 2;
+            var inconveniences = new long[m];
+
+            for (int i = m - 1; i >= 0; i--) {
+                inconveniences[i] = inconvenience;
+
+                var left = nodes[bridges[i].a - 1];
+                var right = nodes[bridges[i].b - 1];
+
+                var leftSize = left.Size();
+                var rightSize = right.Size();
+                if (UnionFind<int>.Connect(left, right)) inconvenience -= leftSize * rightSize;
+            }
+
+            inconveniences.ForEach(WriteLine);
+        }
     }
 }
 
 /* ***************** Following Contents are my common library ******** */
 
 namespace AtCoder {
+    class UnionFind<T> {
+        public T Value { get; set; }
+        private bool isRoot = true;
+        private int size = 1;
+
+        public UnionFind<T> 　Parent;
+
+        public UnionFind<T> Root() {
+            if (isRoot) return this;
+            var root = Parent.Root();
+            Parent = root;
+            return root;
+        }
+
+        public int Size() {
+            return Root().size;
+        }
+
+        public static bool Connect(UnionFind<T> a, UnionFind<T> b) {
+            var aRoot = a.Root();
+            var bRoot = b.Root();
+            if (aRoot == bRoot) return false;
+            aRoot.isRoot = false;
+            aRoot.Parent = bRoot;
+            bRoot.size += aRoot.size;
+            return true;
+        }
+
+    }
+
     static class Algorithm {
         public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, long width) => BinSearch(range, isBigger, x => range.Right - range.Left < width);
         public static LongRange BinSearch(LongRange range, Func<long, bool> isBigger, Func<LongRange, bool> stopCondition) {

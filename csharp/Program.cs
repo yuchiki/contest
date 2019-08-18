@@ -14,31 +14,14 @@ using static AtCoder.StreamExtensions;
 using static AtCoder.Matrix;
 
 namespace AtCoder {
-    using VI = VectorInt2;
-
     static class Program {
         static void Main() {
-            var n = ReadInt();
-            var h = ReadInt(n);
-            var currentHeight = new int[n];
+            var N = ReadInt();
+            var As = ReadDouble(N);
 
-            var pos = 0;
-            var count = 0;
-
-            while (pos < n) {
-                if (currentHeight[pos] == h[pos]) {
-                    pos++;
-                    continue;
-                }
-
-                count++;
-                for (var currentPos = pos; currentPos < n; currentPos++) {
-                    if (currentHeight[currentPos] == h[currentPos]) break;
-                    currentHeight[currentPos]++;
-                }
-            }
-            count.WriteLine();
+            As.Select(Inv).Sum().Call(Inv).WriteLine();
         }
+
     }
 }
 
@@ -126,7 +109,8 @@ namespace AtCoder {
         public static long Mul(long i, long j) => i * j;
         public static Func<long, long> Mul(long j) => i => i * j;
         public static long Div(long i, long j) => j / j;
-        public static Func<long, long> Div(long j) => i => i * j;
+        public static Func<long, long> Div(long j) => i => i / j;
+        public static double Inv(double x) => 1 / x;
         public static long Mod(long i, long j) => i % j;
         public static Func<long, long> Mod(long j) => i => i % j;
 
